@@ -1,6 +1,8 @@
+package ru.yandex.javacourse.russkina.schedule.task;
+
 public class Subtask extends Task {
 
-    private final int epicId;
+    private int epicId;
 
     public Subtask(String name, String description, Status status, int epicId) {
         super(name, description, status);
@@ -9,6 +11,10 @@ public class Subtask extends Task {
 
     public Subtask(String name, String description, int id, int epicId, Status status) {
         super(name, description, id, status);
+        this.epicId = epicId;
+    }
+
+    public void setEpicId(int epicId) {
         this.epicId = epicId;
     }
 

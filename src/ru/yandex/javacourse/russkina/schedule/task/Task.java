@@ -1,9 +1,11 @@
+package ru.yandex.javacourse.russkina.schedule.task;
+
 import java.util.Objects;
 
 public class Task {
 
-    private final String name;
-    private final String description;
+    private String name;
+    private String description;
     private int id;
     private Status status;
 
@@ -12,6 +14,14 @@ public class Task {
         this.description = description;
         this.status = status;
         this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Task(String name, String description, Status status) {
@@ -44,7 +54,7 @@ public class Task {
         this.status = status;
     }
 
-    @Override //я не поняла, где мне их применить
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;

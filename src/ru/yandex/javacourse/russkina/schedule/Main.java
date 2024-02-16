@@ -1,3 +1,8 @@
+package ru.yandex.javacourse.russkina.schedule;
+
+import ru.yandex.javacourse.russkina.schedule.task.*;
+import ru.yandex.javacourse.russkina.schedule.manager.TaskManager;
+
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
@@ -15,37 +20,26 @@ public class Main {
         taskManager.createSubtask(new Subtask("Математика", "номер 55, стр.24",
                 Status.NEW, 6));
 
-        printTasks(taskManager);
+        taskManager.printTest();
 
         taskManager.updateTask(new Task("Помыть посуду",
                 "Тарелки на столе", 1, Status.DONE));
         taskManager.updateSubtask(new Subtask("Математика",
-                "номер 55, стр.24", 7, 6, Status.IN_PROGRESS));
+                "номер 55, стр.24", 7, 6, Status.DONE));
         taskManager.updateSubtask(new Subtask("Пропылесосить", "Сначала", 4, 3,
                 Status.DONE));
         taskManager.updateSubtask(new Subtask("Помыть полы", "После", 5, 3,
-                Status.DONE));
+                Status.IN_PROGRESS));
 
-        printTasks(taskManager);
+        taskManager.printTest();
 
-        taskManager.removeById(5);
+        taskManager.deleteSubtask(7);
 
-        printTasks(taskManager);
+        taskManager.printTest();
 
+        taskManager.deleteEpic(3);
 
-        printTasks(taskManager);
+        taskManager.printTest();
 
-        taskManager.removeEpicById(3);
-
-        printTasks(taskManager);
-
-    }
-
-    public static void printTasks(TaskManager taskManager) {
-        for (Task task : taskManager.tasks.values()) {
-            System.out.print(task.getName() + " id = " + task.getId() + ": ");
-            System.out.println(task.getStatus());
-        }
-        System.out.println();
     }
 }
