@@ -74,12 +74,19 @@ class InMemoryTaskManagerTest {
         assertEquals(task.getDescription(), taskFromTaskManager.getDescription());
         assertEquals(task.getStatus(), taskFromTaskManager.getStatus());
 
+    }
+
+    @Test
+    public void shouldReturnTrueWhenEpicCreateInTaskManagerEqualsEpicInManager() {
         Epic epic = taskManager.createEpic(new Epic("name", "description"));
         Epic epicFromTaskManager = taskManager.getEpic(epic.getId());
         assertEquals(epic.getName(), epicFromTaskManager.getName());
-        assertEquals(epic.getDescription(), taskFromTaskManager.getDescription());
+        assertEquals(epic.getDescription(), epicFromTaskManager.getDescription());
         assertEquals(epic.getSubtasksId(), epicFromTaskManager.getSubtasksId());
+    }
 
+    @Test
+    public void shouldReturnTrueWhenSubtaskCreateInTaskManagerEqualsSubtaskInManager() {
         Subtask subtask = taskManager.createSubtask(new Subtask("name", "description",
                 Status.NEW, epic.getId()));
         Subtask subtaskFromTaskManager = taskManager.getSubtask(subtask.getId());

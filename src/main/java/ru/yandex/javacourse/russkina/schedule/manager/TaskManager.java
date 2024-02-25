@@ -5,6 +5,7 @@ import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     Task createTask(Task task);
@@ -13,11 +14,11 @@ public interface TaskManager {
 
     Subtask createSubtask(Subtask subtask);
 
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
 
-    ArrayList<Subtask> getSubtasks();
+    List<Subtask> getSubtasks();
 
     void removeAllTasks();
 
@@ -45,8 +46,8 @@ public interface TaskManager {
 
     void deleteSubtask(int id);
 
-    ArrayList<Subtask> getEpicSubtasks(int epicId);
+    List<Subtask> getEpicSubtasks(int epicId);
 
-    HistoryManager getHistoryManager();
+    List<Task> getHistory();
 
 }

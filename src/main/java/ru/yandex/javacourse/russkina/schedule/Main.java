@@ -82,7 +82,7 @@ public class Main {
         }
 
         System.out.println("История:");
-        for (Task task : taskManager.getHistoryManager().getHistory()) {
+        for (Task task : taskManager.getHistory()) {
             System.out.println(task);
         }
         System.out.println();
