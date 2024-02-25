@@ -34,11 +34,11 @@ public interface TaskManager {
 
     Subtask getSubtask(int id);
 
-    Task updateTask(Task task);
+    void updateTask(Task task);
 
-    Epic updateEpic(Epic epic);
+    void updateEpic(Epic epic);
 
-    Subtask updateSubtask(Subtask subtask);
+    void updateSubtask(Subtask subtask);
 
     void deleteTask(int id);
 
