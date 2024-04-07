@@ -68,7 +68,7 @@ public class Task {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name + ", id = " + id + ", status = " + status;
     }
 }
