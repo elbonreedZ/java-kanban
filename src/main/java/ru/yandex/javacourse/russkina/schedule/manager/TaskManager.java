@@ -4,7 +4,6 @@ import ru.yandex.javacourse.russkina.schedule.task.Epic;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {

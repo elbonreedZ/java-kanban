@@ -63,6 +63,7 @@ public class Main {
         printAllTasks(taskManager);
 
     }
+
     private static void printAllTasks(TaskManager taskManager) {
         System.out.println("Задачи:");
         for (Task task : taskManager.getTasks()) {

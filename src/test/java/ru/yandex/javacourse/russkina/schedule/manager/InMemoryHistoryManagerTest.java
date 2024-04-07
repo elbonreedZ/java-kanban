@@ -7,14 +7,12 @@ import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
 
     private static TaskManager taskManager;
-    private static List<Task> history;
     private static Task task;
     private static Epic epic;
     private static Subtask subtask;
