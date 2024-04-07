@@ -96,4 +96,23 @@ class InMemoryTaskManagerTest {
         assertEquals(subtask.getEpicId(), subtaskFromTaskManager.getEpicId());
     }
 
+    @Test
+    public void shouldReturnFalseWhenSubtaskDeletedInEpic() {
+        Epic epic = taskManager.createEpic(new Epic("name", "description"));
+        Subtask subtask1 = taskManager.createSubtask(new Subtask("name", "description",
+                Status.NEW, epic.getId()));
+        Subtask subtask2 = taskManager.createSubtask(new Subtask("name", "description",
+                Status.NEW, epic.getId()));
+        int idSub1 = subtask1.getId();
+        taskManager.deleteSubtask(idSub1);
+        assertFalse(epic.getSubtasksId().contains(idSub1));
+    }
+
+    @Test
+    public void shouldReturnFalseInOldEpicSubtaskIdWhenSubtaskSetEpicId() {
+        Epic epic2 = taskManager.createEpic(new Epic("name", "description"));
+        taskManager.setEpicId(epic2.getId(), subtask);
+        assertFalse(epic.getSubtasksId().contains(subtask.getId()));
+    }
+
 }
