@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-
+    private final Map<Integer, Node<Task>> history;
     private Node<Task> head = null;
     private Node<Task> tail = null;
 
-    private final Map<Integer, Node<Task>> history;
 
     InMemoryHistoryManager() {
         history = new HashMap<>();
@@ -30,32 +29,31 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
         int id = task.getId();
-        if (history.containsKey(id)) {
-            removeNode(history.get(id));
-        }
+        removeNode(history.get(id));
         Node<Task> newNode = new Node<>(task);
         linkLast(newNode);
         history.put(id, newNode);
     }
 
+    @Override
     public void remove(int id) {
-        removeNode(history.get(id));
+        Node<Task> remove = history.remove(id);
+        removeNode(remove);
     }
 
     private void linkLast(Node<Task> task) {
         if (head == null) {
             head = task;
-            tail = task;
-            return;
+        } else {
+            tail.next = task;
+            task.prev = tail;
         }
-        tail.next = task;
-        task.prev = tail;
         tail = task;
     }
 
     private List<Task> getTasks() {
         if (head == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<Task> history = new ArrayList<>();
         Node<Task> current = head;
