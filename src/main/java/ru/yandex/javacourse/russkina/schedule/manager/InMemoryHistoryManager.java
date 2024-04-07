@@ -1,26 +1,26 @@
 package ru.yandex.javacourse.russkina.schedule.manager;
 
-import ru.yandex.javacourse.russkina.schedule.task.Epic;
-import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
+    private final Map<Integer, Node<Task>> history;
+    private Node<Task> head = null;
+    private Node<Task> tail = null;
 
-    private static final int MAX_SIZE = 10;
-
-    private final List<Task> history;
 
     InMemoryHistoryManager() {
-        history = new ArrayList<>();
+        history = new HashMap<>();
     }
 
 
     @Override
     public List<Task> getHistory() {
-        return history;
+        return getTasks();
     }
 
     @Override
@@ -28,13 +28,62 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (task == null) {
             return;
         }
-        history.add(task);
-        updateHistory();
+        int id = task.getId();
+        removeNode(history.get(id));
+        Node<Task> newNode = new Node<>(task);
+        newNode.prev = tail;
+        linkLast(newNode);
+        history.put(id, newNode);
     }
 
-    private void updateHistory() {
-        if (history.size() > MAX_SIZE) {
-            history.remove(0);
+    @Override
+    public void remove(int id) {
+        Node<Task> remove = history.remove(id);
+        removeNode(remove);
+    }
+
+    private void linkLast(Node<Task> node) {
+        if (head == null) {
+            head = node;
+        } else {
+            tail.next = node;
+        }
+        tail = node;
+    }
+
+    private List<Task> getTasks() {
+        if (head == null) {
+            return new ArrayList<>();
+        }
+        List<Task> history = new ArrayList<>();
+        Node<Task> current = head;
+        while (true) {
+            history.add(current.data);
+            Node<Task> next = current.next;
+            if (next == null) {
+                break;
+            }
+            current = next;
+        }
+        return history;
+
+    }
+
+    private void removeNode(Node<Task> node) {
+        if (node == null) {
+            return;
+        }
+        Node<Task> prev = node.prev;
+        Node<Task> next = node.next;
+        if (prev != null) {
+            prev.next = next;
+        } else {
+            head = next;
+        }
+        if (next != null) {
+            next.prev = prev;
+        } else {
+            tail = prev;
         }
     }
 
