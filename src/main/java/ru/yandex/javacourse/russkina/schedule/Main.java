@@ -3,64 +3,85 @@ package ru.yandex.javacourse.russkina.schedule;
 import ru.yandex.javacourse.russkina.schedule.task.*;
 import ru.yandex.javacourse.russkina.schedule.manager.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
+
+import static ru.yandex.javacourse.russkina.schedule.manager.FileBackedTaskManager.loadFromFile;
+
 public class Main {
     public static void main(String[] args) {
 
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager fileBackedTaskManager = null;
+        try {
+            File file = File.createTempFile("java-kanban-file", ".cvs");
+            fileBackedTaskManager = loadFromFile(file);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        if (fileBackedTaskManager != null) {
+            printAllTasks(fileBackedTaskManager);
+            printMenu(fileBackedTaskManager);
+        }
+    }
 
-        taskManager.createTask(new Task("Помыть посуду",
-                "Тарелки на столе", Status.NEW));
-        taskManager.createTask(new Task("Купить кроссовки",
-                "Завтра", Status.NEW));
-        taskManager.createEpic(new Epic("Убраться", "Послезавтра"));
-        taskManager.createSubtask(new Subtask("Пропылесосить", "Сначала",
-                Status.NEW, 3));
-        taskManager.createSubtask(new Subtask("Помыть полы", "После",
-                Status.NEW, 3));
-        taskManager.createEpic(new Epic("Сделать дз", "Вечером"));
-        taskManager.createSubtask(new Subtask("Математика", "номер 55, стр.24",
-                Status.NEW, 6));
-
-
-        taskManager.getSubtask(7);
-        taskManager.getEpic(3);
-
-        printAllTasks(taskManager);
-
-        taskManager.getEpic(3);
-        taskManager.getSubtask(4);
-        taskManager.getTask(1);
-        taskManager.getSubtask(5);
-        taskManager.getEpic(6);
-        taskManager.getSubtask(5);
-        taskManager.getSubtask(7);
-        taskManager.getSubtask(5);
-        taskManager.getEpic(3);
-
-        taskManager.updateTask(new Task("Помыть посуду",
-                "Тарелки на столе", 1, Status.DONE));
-        taskManager.updateSubtask(new Subtask("Математика",
-                "номер 55, стр.24", 7, 6, Status.DONE));
-        taskManager.updateSubtask(new Subtask("Пропылесосить", "Сначала", 4, 3,
-                Status.DONE));
-        taskManager.updateSubtask(new Subtask("Помыть полы", "После", 5, 3,
-                Status.IN_PROGRESS));
-
-        printAllTasks(taskManager);
-
-        taskManager.getSubtask(5);
-
-        taskManager.getEpic(6);
-
-        taskManager.deleteSubtask(7);
-
-        printAllTasks(taskManager);
-
-        taskManager.getEpic(3);
-
-        taskManager.deleteEpic(3);
-
-        printAllTasks(taskManager);
+    private static void printMenu(TaskManager taskManager) {
+        while (true) {
+            System.out.println("Что вы хотите сделать?");
+            System.out.println("Создать задачу -> 1");
+            System.out.println("Создать эпик -> 2");
+            System.out.println("Создать подзадачу -> 3");
+            System.out.println("Получить задачу -> 4");
+            System.out.println("Получить эпик -> 5");
+            System.out.println("Получить подзадачу -> 6");
+            System.out.println("Выход -> 7");
+            Scanner scanner = new Scanner(System.in);
+            int input = scanner.nextInt();
+            String taskString;
+            String[] taskElem;
+            int taskId;
+            switch (input) {
+                case 1:
+                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание");
+                    taskString = scanner.next();
+                    taskElem = taskString.split(",");
+                    Task task = taskManager.createTask(new Task(taskElem[0], taskElem[1], Status.NEW));
+                    System.out.println("Создана задача, id = " + task.getId());
+                    break;
+                case 2:
+                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание");
+                    taskString = scanner.next();
+                    taskElem = taskString.split(",");
+                    Epic epic = taskManager.createEpic(new Epic(taskElem[0], taskElem[1]));
+                    System.out.println("Создан эпик, id = " + epic.getId());
+                    break;
+                case 3:
+                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание,epicId");
+                    taskString = scanner.next();
+                    taskElem = taskString.split(",");
+                    Subtask subtask = taskManager.createSubtask(
+                            new Subtask(taskElem[0], taskElem[1], Status.NEW, Integer.parseInt(taskElem[2])));
+                    System.out.println("Создана подзадача, id = " + subtask.getId());
+                    break;
+                case 4:
+                    System.out.println("Введите айди задачи:");
+                    taskId = scanner.nextInt();
+                    System.out.println(taskManager.getTask(taskId));
+                    break;
+                case 5:
+                    System.out.println("Введите айди эпика:");
+                    taskId = scanner.nextInt();
+                    System.out.println(taskManager.getEpic(taskId));
+                    break;
+                case 6:
+                    System.out.println("Введите айди подзадачи:");
+                    taskId = scanner.nextInt();
+                    System.out.println(taskManager.getSubtask(taskId));
+                    break;
+                case 7:
+                    System.exit(0);
+            }
+        }
 
     }
 

@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Types;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -23,4 +25,9 @@ public class Epic extends Task {
         subtasksId = new ArrayList<>();
     }
 
+    @Override
+    public String toString() {
+        return String.format("%d,%s,%s,%s,%s", this.getId(), Types.EPIC, this.getName(), this.getStatus(),
+                this.getDescription());
+    }
 }

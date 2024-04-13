@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Types;
+
 public class Subtask extends Task {
 
     private int epicId;
@@ -20,5 +22,11 @@ public class Subtask extends Task {
 
     public int getEpicId() {
         return epicId;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%d,%s,%s,%s,%s,%d", this.getId(), Types.SUBTASK, this.getName(),
+                this.getStatus(), this.getDescription(), this.getEpicId());
     }
 }

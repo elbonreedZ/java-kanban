@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Types;
+
 import java.util.Objects;
 
 public class Task {
@@ -69,6 +71,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return name + ", id = " + id + ", status = " + status;
+        return String.format("%d,%s,%s,%s,%s", this.getId(), Types.TASK, this.getName(), this.getStatus(),
+                this.getDescription());
     }
 }
