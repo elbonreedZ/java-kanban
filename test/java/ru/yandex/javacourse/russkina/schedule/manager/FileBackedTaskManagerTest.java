@@ -36,7 +36,7 @@ class FileBackedTaskManagerTest {
 
     @Test
     public void shouldReturnStringTaskInSecondLine() throws IOException {
-        String taskInManager = task.toString();
+        String taskInManager = CVSTaskFormat.toString(task);
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.readLine();
             String taskInFile = br.readLine();
