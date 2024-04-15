@@ -11,7 +11,6 @@ import static ru.yandex.javacourse.russkina.schedule.manager.FileBackedTaskManag
 
 public class Main {
     public static void main(String[] args) {
-
         TaskManager fileBackedTaskManager = null;
         try {
             File file = File.createTempFile("java-kanban-file", ".cvs");

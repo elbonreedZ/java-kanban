@@ -2,15 +2,13 @@ package ru.yandex.javacourse.russkina.schedule.manager;
 
 
 import ru.yandex.javacourse.russkina.schedule.task.Epic;
-import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final File file;
 
@@ -126,26 +124,32 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         save();
     }
 
-    public static FileBackedTaskManager loadFromFile(File file) throws IOException {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            br.readLine();
-            boolean isHistory = false;
-            while (br.ready()) {
-                line = br.readLine();
-                if (line.isBlank()) {
-                    isHistory = true;
-                    continue;
+        try {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                br.readLine();
+                boolean isHistory = false;
+                while (br.ready()) {
+                    line = br.readLine();
+                    if (line.isBlank()) {
+                        isHistory = true;
+                        continue;
+                    }
+                    if (!isHistory) {
+                        Task task = CVSTaskFormat.fromString(line);
+                        taskManager.restoreTaskToManager(task);
+                    } else {
+                        List<Integer> history = CVSTaskFormat.historyFromString(line);
+                        taskManager.restoreTasksToHistory(history);
+                    }
                 }
-                if (!isHistory) {
-                    Task task = taskManager.fromString(line);
-                    taskManager.restoreTaskToManager(task);
-                } else {
-                    List<Integer> history = historyFromString(line);
-                    taskManager.restoreTasksToHistory(history);
-                }
+            } catch (IOException e) {
+                throw new ManagerLoadException("Ошибка загрузки файла");
             }
+        } catch (ManagerLoadException e) {
+            System.out.println(e.getMessage());
         }
         return taskManager;
     }
@@ -156,48 +160,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         List<Subtask> subtasks = getSubtasks();
         try {
             try (Writer fileWriter = new FileWriter(file)) {
-                fileWriter.write("id,type,name,status,description,epic\n");
+                fileWriter.write(CVSTaskFormat.getHeader());
+                fileWriter.write("\n");
                 for (Task task : tasks) {
-                    fileWriter.write(task.toString() + "\n");
+                    fileWriter.write(CVSTaskFormat.toString(task) + "\n");
                 }
                 for (Epic epic : epics) {
-                    fileWriter.write(epic.toString() + "\n");
+                    fileWriter.write(CVSTaskFormat.toString(epic) + "\n");
                 }
                 for (Subtask subtask : subtasks) {
-                    fileWriter.write(subtask.toString() + "\n");
+                    fileWriter.write(CVSTaskFormat.toString(subtask) + "\n");
                 }
                 fileWriter.write("\n");
-                fileWriter.write(historyToString(super.historyManager));
+                fileWriter.write(CVSTaskFormat.historyToString(super.historyManager));
             } catch (IOException e) {
                 throw new ManagerSaveException("Ошибка сохранения файла");
             }
         } catch (ManagerSaveException e) {
             System.out.println(e.getMessage());
-        }
-    }
-
-    private Task fromString(String value) {
-        String[] elements = value.split(",");
-        Status status = Status.NEW;
-        switch (elements[3]) {
-            case "NEW":
-                break;
-            case "IN_PROGRESS":
-                status = Status.IN_PROGRESS;
-                break;
-            case "DONE":
-                status = Status.DONE;
-                break;
-        }
-        switch (elements[1]) {
-            case "TASK":
-                return new Task(elements[2], elements[4], Integer.parseInt(elements[0]), status);
-            case "EPIC":
-                return new Epic(elements[2], elements[4], Integer.parseInt(elements[0]));
-            case "SUBTASK":
-                return new Subtask(elements[2], elements[4], Integer.parseInt(elements[0]), Integer.parseInt(elements[5]), status);
-            default:
-                return null;
         }
     }
 
@@ -226,28 +206,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             super.setTaskIdCounter(task.getId());
         }
     }
-
-    private static String historyToString(HistoryManager manager) {
-        List<Task> history = manager.getHistory();
-        StringBuilder historyString = new StringBuilder();
-        for (Task task : history) {
-            historyString.append(task.getId());
-            historyString.append(",");
-        }
-        if (historyString.length() > 0) {
-            historyString.deleteCharAt(historyString.length() - 1); // Удаление последней запятой
-        }
-        return historyString.toString();
-    }
-
-    private static List<Integer> historyFromString(String value) {
-        String[] historyArray = value.split(",");
-        List<Integer> history = new ArrayList<>();
-        for (String elem : historyArray) {
-            history.add(Integer.parseInt(elem));
-        }
-        return history;
-    }
-
-
 }

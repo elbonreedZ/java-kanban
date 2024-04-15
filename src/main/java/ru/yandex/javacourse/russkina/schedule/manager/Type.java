@@ -1,6 +1,6 @@
 package ru.yandex.javacourse.russkina.schedule.manager;
 
-public enum Types {
+public enum Type {
     TASK,
     EPIC,
     SUBTASK
