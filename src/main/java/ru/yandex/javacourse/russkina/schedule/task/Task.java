@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Type;
+
 import java.util.Objects;
 
 public class Task {
@@ -8,6 +10,8 @@ public class Task {
     private String description;
     private int id;
     private Status status;
+
+    private static final Type TYPE = Type.TASK;
 
     public Task(String name, String description, int id, Status status) {
         this.name = name;
@@ -54,6 +58,10 @@ public class Task {
         this.status = status;
     }
 
+    public Type getType() {
+        return TYPE;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -69,6 +77,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return name + ", id = " + id + ", status = " + status;
+        return String.format("%d,%s,%s,%s", this.getId(), this.getName(), this.getStatus(),
+                this.getDescription());
     }
 }
