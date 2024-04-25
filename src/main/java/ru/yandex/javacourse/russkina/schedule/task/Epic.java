@@ -1,8 +1,12 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Type;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
+
+    private static final Type TYPE = Type.EPIC;
 
     private ArrayList<Integer> subtasksId;
 
@@ -22,5 +26,4 @@ public class Epic extends Task {
         super(name, description, id, Status.NEW);
         subtasksId = new ArrayList<>();
     }
-
 }

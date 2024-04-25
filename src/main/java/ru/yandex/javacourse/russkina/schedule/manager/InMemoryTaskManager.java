@@ -9,13 +9,21 @@ import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final Map<Integer, Task> tasks = new HashMap<>();
-    private final Map<Integer, Epic> epics = new HashMap<>();
-    private final Map<Integer, Subtask> subtasks = new HashMap<>();
+    protected final Map<Integer, Task> tasks = new HashMap<>();
+    protected final Map<Integer, Epic> epics = new HashMap<>();
+    protected final Map<Integer, Subtask> subtasks = new HashMap<>();
 
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private int taskIdCounter;
+
+    public int getTaskIdCounter() {
+        return taskIdCounter;
+    }
+
+    public void setTaskIdCounter(int taskIdCounter) {
+        this.taskIdCounter = taskIdCounter;
+    }
 
     public InMemoryTaskManager() {
         taskIdCounter = 0;
@@ -227,7 +235,7 @@ public class InMemoryTaskManager implements TaskManager {
         return ++taskIdCounter;
     }
 
-    private void addSubtaskId(Subtask subtask) {
+    protected void addSubtaskId(Subtask subtask) {
         if (subtask.getId() == subtask.getEpicId()) {
             return;
         }

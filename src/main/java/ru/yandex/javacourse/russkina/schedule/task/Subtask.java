@@ -1,7 +1,10 @@
 package ru.yandex.javacourse.russkina.schedule.task;
 
+import ru.yandex.javacourse.russkina.schedule.manager.Type;
+
 public class Subtask extends Task {
 
+    private static final Type TYPE = Type.SUBTASK;
     private int epicId;
 
     public Subtask(String name, String description, Status status, int epicId) {
