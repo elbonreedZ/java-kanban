@@ -11,7 +11,8 @@ import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class FileBackedTaskManagerTest {
+
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
 
     static TaskManager taskManager;
     static Task task;
@@ -63,5 +64,5 @@ class FileBackedTaskManagerTest {
             assertEquals(history, "" + task.getId());
         }
     }
-
+    //я не могу сделать тесты на исключения, так как исключения обрабатываются в самом методе
 }

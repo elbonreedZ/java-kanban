@@ -5,6 +5,7 @@ import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     Task createTask(Task task);
@@ -50,4 +51,6 @@ public interface TaskManager {
     List<Task> getHistory();
 
     void setEpicId(int id, Subtask subtask);
+
+    Set<Task> getPrioritizedTasks();
 }

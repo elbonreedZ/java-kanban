@@ -5,6 +5,8 @@ import ru.yandex.javacourse.russkina.schedule.manager.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import static ru.yandex.javacourse.russkina.schedule.manager.FileBackedTaskManager.loadFromFile;
@@ -24,7 +26,8 @@ public class Main {
         }
     }
 
-    private static void printMenu(TaskManager taskManager) {
+     private static void printMenu(TaskManager taskManager) {
+         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy;HH:mm");
         while (true) {
             System.out.println("Что вы хотите сделать?");
             System.out.println("Создать задачу -> 1");
@@ -33,7 +36,8 @@ public class Main {
             System.out.println("Получить задачу -> 4");
             System.out.println("Получить эпик -> 5");
             System.out.println("Получить подзадачу -> 6");
-            System.out.println("Выход -> 7");
+            System.out.println("Обновить задачу -> 7");
+            System.out.println("Выход -> 8");
             Scanner scanner = new Scanner(System.in);
             int input = scanner.nextInt();
             String taskString;
@@ -41,11 +45,16 @@ public class Main {
             int taskId;
             switch (input) {
                 case 1:
-                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание");
+                    System.out.println(
+                    "Введите без пробелов через запятую в формате: \n имя,описание,продолжительность," +
+                            "начало(формат:\"dd.MM.yyyy;HH:mm\"");
                     taskString = scanner.next();
                     taskElem = taskString.split(",");
-                    Task task = taskManager.createTask(new Task(taskElem[0], taskElem[1], Status.NEW));
-                    System.out.println("Создана задача, id = " + task.getId());
+                    Task task = taskManager.createTask(new Task(taskElem[0], taskElem[1], Status.NEW,
+                            Long.parseLong(taskElem[2]), LocalDateTime.parse(taskElem[3], formatter)));
+                    if (task != null) {
+                        System.out.println("Создана задача, id = " + task.getId());
+                    }
                     break;
                 case 2:
                     System.out.println("Введите без пробелов через запятую в формате: \n имя,описание");
@@ -55,12 +64,17 @@ public class Main {
                     System.out.println("Создан эпик, id = " + epic.getId());
                     break;
                 case 3:
-                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание,epicId");
+                    System.out.println(
+                    "Введите без пробелов через запятую в формате: \n имя,описание,epicId,продолжительность," +
+                            "начало(формат:\"dd.MM.yyyy;HH:mm\"");
                     taskString = scanner.next();
                     taskElem = taskString.split(",");
                     Subtask subtask = taskManager.createSubtask(
-                            new Subtask(taskElem[0], taskElem[1], Status.NEW, Integer.parseInt(taskElem[2])));
-                    System.out.println("Создана подзадача, id = " + subtask.getId());
+                            new Subtask(taskElem[0], taskElem[1], Status.NEW, Integer.parseInt(taskElem[2]),
+                                    Long.parseLong(taskElem[3]), LocalDateTime.parse(taskElem[4], formatter)));
+                    if (subtask != null) {
+                        System.out.println("Создана подзадача, id = " + subtask.getId());
+                    }
                     break;
                 case 4:
                     System.out.println("Введите айди задачи:");
@@ -78,6 +92,13 @@ public class Main {
                     System.out.println(taskManager.getSubtask(taskId));
                     break;
                 case 7:
+                    System.out.println("Введите без пробелов через запятую в формате: \n имя,описание,продолжительность," +
+                            "начало(формат:\"dd.MM.yyyy;HH:mm\",id");
+                    taskString = scanner.next();
+                    taskElem = taskString.split(",");
+                    taskManager.updateTask(new Task(taskElem[0], taskElem[1], Integer.parseInt(taskElem[4]), Status.NEW,
+                            Long.parseLong(taskElem[2]), LocalDateTime.parse(taskElem[3], formatter)));
+                case 8:
                     System.exit(0);
             }
         }
@@ -107,5 +128,9 @@ public class Main {
             System.out.println(task);
         }
         System.out.println();
+        System.out.println("Отсортированные задачи:");
+        for (Task task: taskManager.getPrioritizedTasks()) {
+            System.out.println(task);
+        }
     }
 }

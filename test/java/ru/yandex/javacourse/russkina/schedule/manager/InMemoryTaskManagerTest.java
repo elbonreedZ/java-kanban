@@ -7,9 +7,11 @@ import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
 
     static TaskManager taskManager;
     static Task task;
@@ -23,6 +25,7 @@ class InMemoryTaskManagerTest {
         epic = taskManager.createEpic(new Epic("name", "description"));
         subtask = taskManager.createSubtask(new Subtask("name", "description", Status.NEW, epic.getId()));
     }
+
 
     @Test
     public void shouldReturnNullIfSubtaskMakeItselfItsOwnEpic() {
@@ -98,21 +101,93 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void shouldReturnFalseWhenSubtaskDeletedInEpic() {
-        Epic epic = taskManager.createEpic(new Epic("name", "description"));
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask1 = taskManager.createSubtask(new Subtask("name", "description",
                 Status.NEW, epic.getId()));
         Subtask subtask2 = taskManager.createSubtask(new Subtask("name", "description",
                 Status.NEW, epic.getId()));
         int idSub1 = subtask1.getId();
         taskManager.deleteSubtask(idSub1);
-        assertFalse(epic.getSubtasksId().contains(idSub1));
+        assertFalse(epic1.getSubtasksId().contains(idSub1));
     }
 
     @Test
     public void shouldReturnFalseInOldEpicSubtaskIdWhenSubtaskSetEpicId() {
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        Subtask subtask1 = taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
         Epic epic2 = taskManager.createEpic(new Epic("name", "description"));
-        taskManager.setEpicId(epic2.getId(), subtask);
-        assertFalse(epic.getSubtasksId().contains(subtask.getId()));
+        taskManager.setEpicId(epic2.getId(), subtask1);
+        assertFalse(epic1.getSubtasksId().contains(subtask1.getId()));
     }
 
+    @Test
+    public void shouldReturnTrueForEpicStatusNewWhenSubtasksAllNew() {
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+       taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+        assertEquals(Status.NEW, taskManager.getEpic(epic1.getId()).getStatus());
+    }
+
+    @Test
+    public void shouldReturnTrueForEpicStatusDoneWhenSubtasksAllDone() {
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+        assertEquals(Status.DONE, taskManager.getEpic(epic1.getId()).getStatus());
+    }
+
+    @Test
+    public void shouldReturnTrueForEpicStatusInProgressWhenSubtasksNewAndDone() {
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+        assertEquals(Status.IN_PROGRESS, taskManager.getEpic(epic1.getId()).getStatus());
+    }
+
+    @Test
+    public void shouldReturnTrueForEpicStatusInProgressWhenSubtasksAllInProgress() {
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+        taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+        assertEquals(Status.IN_PROGRESS, taskManager.getEpic(epic1.getId()).getStatus());
+    }
+
+    @Test
+    public void shouldReturnNullWhenTaskTimeOverlapAnotherTaskTime() {
+        taskManager.createTask(new Task("name", "description", Status.NEW,
+                90, LocalDateTime.of(2024, 2, 3, 18,40)));
+        Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
+        Subtask subtask1 = taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
+                180, LocalDateTime.of(2024, 2, 3, 16,40)));
+        Subtask subtask2 = taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
+                        180, LocalDateTime.of(2024, 2, 3, 14,40)));
+        Subtask subtask3 = taskManager.createSubtask(
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
+                        180, LocalDateTime.of(2024, 2, 3, 18,45)));
+        Task task2 = taskManager.createTask(new Task("name", "description", Status.NEW,
+                90, LocalDateTime.of(2024, 2, 3, 20,20)));
+        assertNull(subtask1);
+        assertNotNull(subtask2);
+        assertNull(subtask3);
+        assertNotNull(task2);
+    }
 }
