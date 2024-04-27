@@ -10,6 +10,7 @@ public class Epic extends Task {
 
     private static final Type TYPE = Type.EPIC;
     private LocalDateTime endTime;
+    private List<Integer> subtasksId;
 
     @Override
     public LocalDateTime getEndTime() {
@@ -19,8 +20,6 @@ public class Epic extends Task {
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
-
-    private List<Integer> subtasksId;
 
     @Override
     public Type getType() {
