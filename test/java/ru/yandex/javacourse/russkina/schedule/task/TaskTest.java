@@ -9,12 +9,6 @@ import ru.yandex.javacourse.russkina.schedule.manager.Managers;
 import ru.yandex.javacourse.russkina.schedule.manager.TaskManager;
 
 class TaskTest {
-    static TaskManager taskManager;
-
-    @BeforeAll
-    public static void beforeAll() {
-        taskManager = Managers.getDefault();
-    }
 
     @Test
     public void shouldReturnTrueIfTaskIdsEquals() {
