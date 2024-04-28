@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.russkina.schedule.manager;
+package ru.yandex.javacourse.russkina.schedule.exception;
 
 public class ManagerLoadException extends RuntimeException {
     public ManagerLoadException(String message) {

@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.russkina.schedule.manager;
 
+import ru.yandex.javacourse.russkina.schedule.exception.TaskValidationException;
 import ru.yandex.javacourse.russkina.schedule.task.*;
 
 import java.time.LocalDateTime;
@@ -45,9 +46,7 @@ public class InMemoryTaskManager implements TaskManager {
         task.setId(generateTaskId());
         Task finalTask = new Task(task.getName(), task.getDescription(), task.getId(), task.getStatus(),
                 task.getDuration(), task.getStartTime());
-        if (isTasksOverlapStream(finalTask)) {
-            return null;
-        }
+        addPrioritized(finalTask);
         tasks.put(finalTask.getId(), finalTask);
         return finalTask;
     }
@@ -70,9 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(generateTaskId());
         Subtask finalTask = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getId(),
                 subtask.getEpicId(), subtask.getStatus(), subtask.getDuration(), subtask.getStartTime());
-        if (isTasksOverlapStream(finalTask)) {
-            return null;
-        }
+        addPrioritized(finalTask);
         subtasks.put(finalTask.getId(), finalTask);
         addSubtaskId(finalTask);
         updateEpic(epicId);
@@ -146,10 +143,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (savedTask == null) {
             return;
         }
-        tasks.remove(id);
-        if (isTasksOverlapStream(task)) {
-            return;
-        }
+        addPrioritized(task);
         tasks.put(id, task);
     }
 
@@ -176,9 +170,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
-        if (isTasksOverlapStream(subtask)) {
-            return;
-        }
+        addPrioritized(subtask);
         subtasks.put(id, subtask);
         updateEpic(epicId);
     }
@@ -242,46 +234,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Set<Task> getPrioritizedTasks() {
-        prioritizedTasks.addAll(getTasks().stream()
-                .filter(task -> task.getStartTime() != null)
-                .collect(Collectors.toList()));
-        prioritizedTasks.addAll(getEpics().stream()
-                .filter(epic -> epic.getStartTime() != null)
-                .collect(Collectors.toList()));
-        prioritizedTasks.addAll(getSubtasks().stream()
-                .filter(subtask -> subtask.getStartTime() != null)
-                .collect(Collectors.toList()));
-        return prioritizedTasks;
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
     }
 
     protected void updateEpic(int epicId) {
-        updateEpicStatus(epicId);
-        updateEpicDurationAndTime(epicId);
+        Epic epic = epics.get(epicId);
+        updateEpicStatus(epic);
+        updateEpicDurationAndTime(epic);
     }
 
-    private boolean isTasksOverlapStream(Task newTask) {
+    private void addPrioritized(Task newTask) {
         if (newTask.getStartTime() == null) {
-            return false;
+            throw new TaskValidationException(
+                    "Задача не может быть добавлена/обновлена, отсутсвует время старта");
         }
-        try {
-            Optional<Task> crossedTask = getPrioritizedTasks().stream()
-                    .filter(task -> !task.getType().equals(Type.EPIC))
-                    .filter(task -> task.getId() != newTask.getId())
-                    .filter(streamTask -> isTasksOverlap(newTask, streamTask))
-                    .findFirst();
-            if (crossedTask.isPresent()) {
-                throw new TaskValidationException(
-                        "Задача не может быть добавлена/обновлена, она пересекается с id = " + crossedTask.get().getId()
-                                + ", время начала: " + crossedTask.get().getStartTime() +
-                                ", время окончания: " + crossedTask.get().getEndTime()
-                );
-            }
-        } catch (TaskValidationException e) {
-                System.out.println(e.getMessage());
-                return true;
+
+        Optional<Task> crossedTask = getPrioritizedTasks().stream()
+                .filter(task -> !task.getType().equals(Type.EPIC))
+                .filter(task -> task.getId() != newTask.getId())
+                .filter(streamTask -> isTasksOverlap(newTask, streamTask))
+                .findFirst();
+        if (crossedTask.isPresent()) {
+            throw new TaskValidationException(
+                    "Задача не может быть добавлена/обновлена, она пересекается с id = " + crossedTask.get().getId()
+                            + ", время начала: " + crossedTask.get().getStartTime() +
+                            ", время окончания: " + crossedTask.get().getEndTime()
+            );
         }
-        return false;
+        prioritizedTasks.add(newTask);
     }
 
     private boolean isTasksOverlap(Task task1, Task task2) {
@@ -290,8 +271,7 @@ public class InMemoryTaskManager implements TaskManager {
         return !(isEndTimeBefore || isStartTimeAfter);
     }
 
-    private void updateEpicDurationAndTime(int epicId) {
-        Epic epic = epics.get(epicId);
+    private void updateEpicDurationAndTime(Epic epic) {
         long duration = 0;
         LocalDateTime minDateTime = LocalDateTime.MAX;
         LocalDateTime maxDateTime = LocalDateTime.MIN;
@@ -326,8 +306,8 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtasksId().add(subtask.getId());
     }
 
-    private void updateEpicStatus(int epicId) {
-        Epic epic = epics.get(epicId);
+    private void updateEpicStatus(Epic epic) {
+        int epicId = epic.getId();
         Epic updatedEpic = new Epic(epic.getName(), epic.getDescription(), epicId);
         updatedEpic.setSubtasksId(epic.getSubtasksId());
         if (getEpicSubtasks(epicId).isEmpty()) {
