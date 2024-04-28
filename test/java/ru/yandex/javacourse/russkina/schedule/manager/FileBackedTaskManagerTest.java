@@ -2,12 +2,14 @@ package ru.yandex.javacourse.russkina.schedule.manager;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.russkina.schedule.exception.TaskValidationException;
 import ru.yandex.javacourse.russkina.schedule.task.Epic;
 import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 import java.io.*;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,10 +31,12 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        task = taskManager.createTask(new Task("name", "description", Status.NEW,
+                180, LocalDateTime.of(2024, 2, 3, 14,40)));
         epic = taskManager.createEpic(new Epic("name", "description"));
         subtask = taskManager.createSubtask(
-                new Subtask("name", "description", Status.NEW, epic.getId()));
+                new Subtask("name", "description", Status.NEW, epic.getId(),
+                        180, LocalDateTime.of(2023, 2, 3, 14,40)));
     }
 
     @Test

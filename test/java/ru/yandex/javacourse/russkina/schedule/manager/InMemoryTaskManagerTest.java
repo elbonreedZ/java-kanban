@@ -2,6 +2,7 @@ package ru.yandex.javacourse.russkina.schedule.manager;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.russkina.schedule.exception.TaskValidationException;
 import ru.yandex.javacourse.russkina.schedule.task.Epic;
 import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
@@ -21,9 +22,11 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     @BeforeAll
     public static void beforeAll() {
         taskManager = Managers.getDefault();
-        task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2024, 2,2,23,50)));
         epic = taskManager.createEpic(new Epic("name", "description"));
-        subtask = taskManager.createSubtask(new Subtask("name", "description", Status.NEW, epic.getId()));
+        subtask = taskManager.createSubtask(new Subtask("name", "description", Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2023, 2,2,23,50)));
     }
 
 
@@ -59,19 +62,22 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     @Test
     public void shouldReturnTrueIfIdsNotEquals() {
         Task inputIdTask = taskManager.createTask(new Task(
-                "name", "description", task.getId(), Status.NEW));
+                "name", "description", task.getId(), Status.NEW, 90,
+                LocalDateTime.of(2022, 2,2,23,50)));
         assertNotEquals(inputIdTask, task, "Две задачи созданы с одинаковым айди");
         Task inputIdEpic = taskManager.createEpic(new Epic(
                 "name", "description", epic.getId()));
         assertNotEquals(inputIdEpic, epic, "Две задачи созданы с одинаковым айди");
         Task inputIdSubtask = taskManager.createSubtask(new Subtask(
-                "name", "description", subtask.getId(), inputIdEpic.getId(), Status.NEW));
+                "name", "description", subtask.getId(), inputIdEpic.getId(), Status.NEW, 90,
+                LocalDateTime.of(2021, 2,2,23,50)));
         assertNotEquals(inputIdSubtask, subtask, "Две задачи созданы с одинаковым айди");
     }
 
     @Test
     public void shouldReturnTrueWhenTaskCreateInTaskManagerEqualsTaskInManager() {
-        Task task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        Task task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2020, 2,2,23,50)));
         Task taskFromTaskManager = taskManager.getTask(task.getId());
         assertEquals(task.getName(), taskFromTaskManager.getName());
         assertEquals(task.getDescription(), taskFromTaskManager.getDescription());
@@ -91,7 +97,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     @Test
     public void shouldReturnTrueWhenSubtaskCreateInTaskManagerEqualsSubtaskInManager() {
         Subtask subtask = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2019, 2,2,23,50)));
         Subtask subtaskFromTaskManager = taskManager.getSubtask(subtask.getId());
         assertEquals(subtask.getName(), subtaskFromTaskManager.getName());
         assertEquals(subtask.getDescription(), subtaskFromTaskManager.getDescription());
@@ -103,9 +110,11 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnFalseWhenSubtaskDeletedInEpic() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask1 = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2018, 2,2,23,50)));
         Subtask subtask2 = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2017, 2,2,23,50)));
         int idSub1 = subtask1.getId();
         taskManager.deleteSubtask(idSub1);
         assertFalse(epic1.getSubtasksId().contains(idSub1));
@@ -115,7 +124,8 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnFalseInOldEpicSubtaskIdWhenSubtaskSetEpicId() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask1 = taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(), 90,
+                        LocalDateTime.of(2016, 2,2,23,50)));
         Epic epic2 = taskManager.createEpic(new Epic("name", "description"));
         taskManager.setEpicId(epic2.getId(), subtask1);
         assertFalse(epic1.getSubtasksId().contains(subtask1.getId()));
@@ -125,11 +135,14 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnTrueForEpicStatusNewWhenSubtasksAllNew() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(), 90,
+                        LocalDateTime.of(2015, 2,2,23,50)));
        taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(), 90,
+                        LocalDateTime.of(2014, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(), 90,
+                        LocalDateTime.of(2013, 2,2,23,50)));
         assertEquals(Status.NEW, taskManager.getEpic(epic1.getId()).getStatus());
     }
 
@@ -137,11 +150,14 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnTrueForEpicStatusDoneWhenSubtasksAllDone() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+                new Subtask("name", "descr", Status.DONE, epic1.getId(), 90,
+                        LocalDateTime.of(2012, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+                new Subtask("name", "descr", Status.DONE, epic1.getId(), 90,
+                        LocalDateTime.of(2011, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+                new Subtask("name", "descr", Status.DONE, epic1.getId(), 90,
+                        LocalDateTime.of(2010, 2,2,23,50)));
         assertEquals(Status.DONE, taskManager.getEpic(epic1.getId()).getStatus());
     }
 
@@ -149,11 +165,14 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnTrueForEpicStatusInProgressWhenSubtasksNewAndDone() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(),90,
+                        LocalDateTime.of(2009, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.NEW, epic1.getId()));
+                new Subtask("name", "descr", Status.NEW, epic1.getId(), 90,
+                        LocalDateTime.of(2008, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.DONE, epic1.getId()));
+                new Subtask("name", "descr", Status.DONE, epic1.getId(), 90,
+                        LocalDateTime.of(2007, 2,2,23,50)));
         assertEquals(Status.IN_PROGRESS, taskManager.getEpic(epic1.getId()).getStatus());
     }
 
@@ -161,11 +180,14 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
     public void shouldReturnTrueForEpicStatusInProgressWhenSubtasksAllInProgress() {
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(), 90,
+                        LocalDateTime.of(2006, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(), 90,
+                        LocalDateTime.of(2005, 2,2,23,50)));
         taskManager.createSubtask(
-                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId()));
+                new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(), 90,
+                        LocalDateTime.of(2004, 2,2,23,50)));
         assertEquals(Status.IN_PROGRESS, taskManager.getEpic(epic1.getId()).getStatus());
     }
 
@@ -174,20 +196,18 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
         taskManager.createTask(new Task("name", "description", Status.NEW,
                 90, LocalDateTime.of(2024, 2, 3, 18,40)));
         Epic epic1 = taskManager.createEpic(new Epic("name", "description"));
-        Subtask subtask1 = taskManager.createSubtask(
+        assertThrows(TaskValidationException.class,() -> taskManager.createSubtask(
                 new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
-                180, LocalDateTime.of(2024, 2, 3, 16,40)));
+                        180, LocalDateTime.of(2024, 2, 3, 16,40))));
         Subtask subtask2 = taskManager.createSubtask(
                 new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
                         180, LocalDateTime.of(2024, 2, 3, 14,40)));
-        Subtask subtask3 = taskManager.createSubtask(
+        assertThrows(TaskValidationException.class,() ->taskManager.createSubtask(
                 new Subtask("name", "descr", Status.IN_PROGRESS, epic1.getId(),
-                        180, LocalDateTime.of(2024, 2, 3, 18,45)));
+                        180, LocalDateTime.of(2024, 2, 3, 18,45))));
         Task task2 = taskManager.createTask(new Task("name", "description", Status.NEW,
                 90, LocalDateTime.of(2024, 2, 3, 20,20)));
-        assertNull(subtask1);
         assertNotNull(subtask2);
-        assertNull(subtask3);
         assertNotNull(task2);
     }
 }

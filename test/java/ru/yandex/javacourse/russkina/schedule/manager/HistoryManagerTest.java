@@ -7,6 +7,7 @@ import ru.yandex.javacourse.russkina.schedule.task.Status;
 import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,10 +18,12 @@ class HistoryManagerTest {
     @Test
     public void shouldReturn3ForHistorySize() {
         TaskManager taskManager = Managers.getDefault();
-        Task task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        Task task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2024, 2,2,23,50)));
         Epic epic = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2023, 2,2,23,50)));
         taskManager.getTask(task.getId());
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
@@ -31,10 +34,12 @@ class HistoryManagerTest {
     @Test
     public void shouldReturn1ForHistorySizeWhenTaskDeleted() {
         TaskManager taskManager = Managers.getDefault();
-        Task task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        Task task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2024, 2,2,23,50)));
         Epic epic = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2023, 2,2,23,50)));
         taskManager.getTask(task.getId());
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
@@ -45,10 +50,12 @@ class HistoryManagerTest {
     @Test
     public void shouldReturnTrueWhenGetHistoryEquals() {
         TaskManager taskManager = Managers.getDefault();
-        Task task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        Task task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2024, 2,2,23,50)));
         Epic epic = taskManager.createEpic(new Epic("name", "description"));
         Subtask subtask = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2023, 2,2,23,50)));
         taskManager.getTask(task.getId());
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());

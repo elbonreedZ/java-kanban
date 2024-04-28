@@ -8,6 +8,8 @@ import ru.yandex.javacourse.russkina.schedule.task.Subtask;
 import ru.yandex.javacourse.russkina.schedule.task.Task;
 
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
@@ -20,10 +22,12 @@ class InMemoryHistoryManagerTest {
     @BeforeAll
     public static void beforeAll() {
         taskManager = Managers.getDefault();
-        task = taskManager.createTask(new Task("name", "description", Status.NEW));
+        task = taskManager.createTask(new Task("name", "description", Status.NEW, 90,
+                LocalDateTime.of(2024, 2,2,23,50)));
         epic = taskManager.createEpic(new Epic("name", "description"));
         subtask = taskManager.createSubtask(new Subtask("name", "description",
-                Status.NEW, epic.getId()));
+                Status.NEW, epic.getId(), 90,
+                LocalDateTime.of(2023, 2,2,23,50)));
     }
 
     @Test
