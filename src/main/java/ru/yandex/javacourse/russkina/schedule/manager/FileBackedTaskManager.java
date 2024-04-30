@@ -103,21 +103,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
+    public Task deleteTask(int id) {
         super.deleteTask(id);
         save();
+        return null;
     }
 
     @Override
-    public void deleteEpic(int id) {
+    public Epic deleteEpic(int id) {
         super.deleteEpic(id);
         save();
+        return null;
     }
 
     @Override
-    public void deleteSubtask(int id) {
+    public Subtask deleteSubtask(int id) {
         super.deleteSubtask(id);
         save();
+        return null;
     }
 
     @Override
@@ -160,7 +163,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<Task> tasks = getTasks();
         List<Epic> epics = getEpics();
         List<Subtask> subtasks = getSubtasks();
-        try {
             try (Writer fileWriter = new FileWriter(file)) {
                 fileWriter.write(CVSTaskFormat.getHeader());
                 fileWriter.write("\n");
@@ -178,9 +180,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             } catch (IOException e) {
                 throw new ManagerSaveException("Ошибка сохранения файла");
             }
-        } catch (ManagerSaveException e) {
-            System.out.println(e.getMessage());
-        }
     }
 
     private void restoreTasksToHistory(List<Integer> history) {

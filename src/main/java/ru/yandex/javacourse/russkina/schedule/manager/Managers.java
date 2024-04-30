@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.russkina.schedule.manager;
 
+import java.io.File;
+
 public class Managers {
     public static TaskManager getDefault() {
         return getInMemoryTaskManager();
@@ -13,4 +15,7 @@ public class Managers {
         return new InMemoryHistoryManager();
     }
 
+    public static TaskManager getFileBackedTaskManager(File file) {
+        return FileBackedTaskManager.loadFromFile(file);
+    }
 }
