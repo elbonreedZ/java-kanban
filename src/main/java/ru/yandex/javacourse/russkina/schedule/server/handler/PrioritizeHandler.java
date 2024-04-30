@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.russkina.schedule.server;
+package ru.yandex.javacourse.russkina.schedule.server.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class PrioritizeHandler extends BaseHttpHandler implements HttpHandler {
 
-    TaskManager manager;
+    private final TaskManager manager;
 
     public PrioritizeHandler(TaskManager manager) {
         this.manager = manager;

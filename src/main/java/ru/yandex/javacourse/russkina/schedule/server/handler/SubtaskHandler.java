@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.russkina.schedule.server;
+package ru.yandex.javacourse.russkina.schedule.server.handler;
 
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class SubtaskHandler extends BaseHttpHandler implements HttpHandler {
 
-    TaskManager manager;
+    private final TaskManager manager;
 
     public SubtaskHandler(TaskManager manager) {
         this.manager = manager;

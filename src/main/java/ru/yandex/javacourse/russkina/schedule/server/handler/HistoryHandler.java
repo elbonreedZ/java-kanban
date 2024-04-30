@@ -1,14 +1,13 @@
-package ru.yandex.javacourse.russkina.schedule.server;
+package ru.yandex.javacourse.russkina.schedule.server.handler;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.russkina.schedule.manager.TaskManager;
-
 import java.io.IOException;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
 
-    TaskManager manager;
+    private final TaskManager manager;
 
     public HistoryHandler(TaskManager manager) {
         this.manager = manager;
