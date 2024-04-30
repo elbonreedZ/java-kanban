@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.russkina.schedule;
 
+import ru.yandex.javacourse.russkina.schedule.server.HttpTaskServer;
 import ru.yandex.javacourse.russkina.schedule.task.*;
 import ru.yandex.javacourse.russkina.schedule.manager.*;
 
@@ -17,12 +18,10 @@ public class Main {
         try {
             File file = File.createTempFile("java-kanban-file", ".cvs");
             fileBackedTaskManager = loadFromFile(file);
+            HttpTaskServer taskServer = new HttpTaskServer();
+            taskServer.start();
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        }
-        if (fileBackedTaskManager != null) {
-            printAllTasks(fileBackedTaskManager);
-            printMenu(fileBackedTaskManager);
         }
     }
 

@@ -1,8 +1,6 @@
 package ru.yandex.javacourse.russkina.schedule.task;
-
 import ru.yandex.javacourse.russkina.schedule.manager.Type;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -12,7 +10,7 @@ public class Task {
     private String description;
     private int id;
     private Status status;
-    private Duration duration;
+    private long duration;
     private LocalDateTime startTime;
 
     public Task(String name, String description, int id, Status status) {
@@ -28,32 +26,29 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description, int id, Status status, long minutes, LocalDateTime startTime) {
+    public Task(String name, String description, int id, Status status, long duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.id = id;
-        this.duration = Duration.ofMinutes(minutes);
+        this.duration = duration;
         this.startTime = startTime;
     }
 
-    public Task(String name, String description, Status status, long minutes, LocalDateTime startTime) {
+    public Task(String name, String description, Status status, long duration, LocalDateTime startTime) {
         this.name = name;
         this.description = description;
         this.status = status;
-        this.duration = Duration.ofMinutes(minutes);
+        this.duration = duration;
         this.startTime = startTime;
     }
 
-    public Long getDuration() {
-        if (duration == null) {
-            return 0L;
-        }
-        return duration.toMinutes();
+    public long getDuration() {
+        return duration;
     }
 
-    public void setDuration(Long minutes) {
-        this.duration = Duration.ofMinutes(minutes);
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     public LocalDateTime getStartTime() {
@@ -68,7 +63,7 @@ public class Task {
         if (startTime == null) {
             return null;
         }
-        return this.startTime.plus(duration);
+        return this.startTime.plusMinutes(duration);
     }
 
     public void setName(String name) {

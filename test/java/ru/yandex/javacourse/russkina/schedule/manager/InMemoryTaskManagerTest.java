@@ -2,6 +2,7 @@ package ru.yandex.javacourse.russkina.schedule.manager;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.russkina.schedule.exception.NotFoundException;
 import ru.yandex.javacourse.russkina.schedule.exception.TaskValidationException;
 import ru.yandex.javacourse.russkina.schedule.task.Epic;
 import ru.yandex.javacourse.russkina.schedule.task.Status;
@@ -32,11 +33,11 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager>{
 
     @Test
     public void shouldReturnNullIfSubtaskMakeItselfItsOwnEpic() {
-        Subtask subtask1 = taskManager.createSubtask(new Subtask(
+        assertThrows(NotFoundException.class ,() -> taskManager.createSubtask(new Subtask(
                 "name1",
                 "description1",
-                Status.NEW, subtask.getId()));
-        assertNull(subtask1);
+                Status.NEW, subtask.getId())));
+
     }
 
     @Test

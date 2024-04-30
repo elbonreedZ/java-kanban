@@ -35,7 +35,7 @@ class InMemoryHistoryManagerTest {
         taskManager.getTask(task.getId());
         taskManager.getEpic(epic.getId());
         taskManager.getSubtask(subtask.getId());
-        taskManager.getTask(subtask.getId()); //удалил предыдущий просмотр задачи
+        taskManager.getTask(task.getId()); //удалил предыдущий просмотр задачи
         taskManager.deleteEpic(epic.getId()); // удалил эпик и его подзадачи
         assertEquals(1, taskManager.getHistory().size());
     }

@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.russkina.schedule.manager;
 
+import ru.yandex.javacourse.russkina.schedule.exception.NotFoundException;
 import ru.yandex.javacourse.russkina.schedule.exception.TaskValidationException;
 import ru.yandex.javacourse.russkina.schedule.task.*;
 
@@ -64,7 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask createSubtask(Subtask subtask) {
         int epicId = subtask.getEpicId();
         if (epics.get(epicId) == null) {
-            return null;
+            throw new NotFoundException("Эпик id = " + epicId + " не найден");
         }
         subtask.setId(generateTaskId());
         Subtask finalTask = new Subtask(subtask.getName(), subtask.getDescription(), subtask.getId(),
@@ -120,20 +121,32 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTask(int id) {
-        historyManager.add(tasks.get(id));
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        if (task == null) {
+            throw new NotFoundException("Задача id = " + id + " не найдена");
+        }
+        historyManager.add(task);
+        return task;
     }
 
     @Override
     public Epic getEpic(int id) {
-        historyManager.add(epics.get(id));
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        if (epic == null) {
+            throw new NotFoundException("Эпик id = " + id + " не найден");
+        }
+        historyManager.add(epic);
+        return epic;
     }
 
     @Override
     public Subtask getSubtask(int id) {
-        historyManager.add(subtasks.get(id));
-        return subtasks.get(id);
+        Subtask subtask = subtasks.get(id);
+        if (subtask == null) {
+            throw new NotFoundException("Подадача id = " + id + " не найдена");
+        }
+        historyManager.add(subtask);
+        return subtask;
     }
 
     @Override
@@ -141,7 +154,7 @@ public class InMemoryTaskManager implements TaskManager {
         int id = task.getId();
         Task savedTask = tasks.get(id);
         if (savedTask == null) {
-            return;
+            throw new NotFoundException("Задача id = " + id + " не найдена");
         }
         addPrioritized(task);
         tasks.put(id, task);
@@ -151,7 +164,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpic(Epic epic) {
         Epic savedEpic = epics.get(epic.getId());
         if (savedEpic == null) {
-            return;
+            throw new NotFoundException("Эпик id = " + epic.getId() + " не найден");
         }
         epic.setSubtasksId(savedEpic.getSubtasksId());
         epic.setStatus(savedEpic.getStatus());
@@ -164,11 +177,11 @@ public class InMemoryTaskManager implements TaskManager {
         int epicId = subtask.getEpicId();
         Subtask savedSubtask = subtasks.get(id);
         if (savedSubtask == null) {
-            return;
+            throw new NotFoundException("Подадача id = " + id + " не найдена");
         }
         Epic epic = epics.get(epicId);
         if (epic == null) {
-            return;
+            throw new NotFoundException("Эпик с подзадачей id = " + id + " не найден");
         }
         addPrioritized(subtask);
         subtasks.put(id, subtask);
@@ -176,26 +189,34 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
-        tasks.remove(id);
+    public Task deleteTask(int id) {
+        Task task = tasks.remove(id);
+        if (task == null) {
+            throw new NotFoundException("Задача с id = " + id + " не найдена");
+        }
         historyManager.remove(id);
+        return task;
     }
 
     @Override
-    public void deleteEpic(int id) {
+    public Epic deleteEpic(int id) {
         final Epic epic = epics.remove(id);
+        if (epic == null) {
+            throw new NotFoundException("Эпик с id = " + id + "не найден");
+        }
         for (Integer subtaskId : epic.getSubtasksId()) {
             subtasks.remove(subtaskId);
             historyManager.remove(subtaskId);
         }
         historyManager.remove(id);
+        return epic;
     }
 
     @Override
-    public void deleteSubtask(int id) {
+    public Subtask deleteSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
         if (subtask == null) {
-            return;
+            throw new NotFoundException("Подадача с id = " + id + "не найдена");
         }
         Epic epic = epics.get(subtask.getEpicId());
         List<Integer> subtasksId = epic.getSubtasksId();
@@ -203,6 +224,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setSubtasksId(subtasksId);
         updateEpic(epic.getId());
         historyManager.remove(id);
+        return subtask;
     }
 
 
@@ -210,7 +232,7 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Subtask> getEpicSubtasks(int epicId) {
         Epic epic = epics.get(epicId);
         if (epic == null) {
-            return null;
+            throw new NotFoundException("Эпик id = " + epicId + " не найден");
         }
         return epic.getSubtasksId().stream()
                 .map(subtasks::get).collect(Collectors.toList());
